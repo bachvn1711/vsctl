@@ -1,0 +1,2 @@
+[console_scripts]
+vssctl = vssctl.cli:app

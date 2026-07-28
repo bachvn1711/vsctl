@@ -1,0 +1,10 @@
+version: '0.1'
+signals:
+- parent: Vehicle.ADAS
+  name: Speed
+  datatype: float
+  description: Vehicle Speed
+  unit: null
+  writable: false
+  minimum: null
+  maximum: null
