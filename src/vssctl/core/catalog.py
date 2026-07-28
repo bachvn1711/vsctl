@@ -1,6 +1,6 @@
 from .storage import Storage
 from .models import Signal
-
+from .validator import Validator
 
 class CatalogService:
 
@@ -10,11 +10,19 @@ class CatalogService:
 
         self.catalog = self.storage.load()
 
+        self.validator = Validator()
+
+
     def list(self):
 
         return self.catalog.signals
 
     def add(self, signal: Signal):
+
+        self.validator.validate(
+                    signal,
+                    self.catalog,
+                )
 
         self.catalog.signals.append(signal)
 
