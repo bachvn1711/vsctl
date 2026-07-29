@@ -6,28 +6,27 @@ from .models import Catalog
 
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
-
-CATALOG = PROJECT_ROOT / "workspace" / "catalog" / "signals.yaml"
+from vssctl.core.paths import SIGNALS_YAML
+# CATALOG = PROJECT_ROOT / "workspace" / "catalog" / "signals.yaml"
 
 
 class Storage:
 
     def load(self) -> Catalog:
 
-        if not CATALOG.exists():
+        if not SIGNALS_YAML.exists():
             return Catalog()
 
-        with open(CATALOG) as f:
+        with SIGNALS_YAML.open("r", encoding="utf-8") as f:
             data = yaml.safe_load(f)
 
         return Catalog.model_validate(data)
 
     def save(self, catalog: Catalog):
 
-        CATALOG.parent.mkdir(parents=True, exist_ok=True)
+        SIGNALS_YAML.parent.mkdir(parents=True, exist_ok=True)
 
-        with open(CATALOG, "w") as f:
+        with SIGNALS_YAML.open("w", encoding="utf-8") as f:
 
             yaml.safe_dump(
 
