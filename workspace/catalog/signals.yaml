@@ -8,3 +8,11 @@ signals:
   writable: false
   minimum: null
   maximum: null
+- parent: Vehicle.ADAS
+  name: Enabled
+  datatype: boolean
+  description: ADAS enabled
+  unit: null
+  writable: false
+  minimum: null
+  maximum: null

@@ -1,12 +1,26 @@
-from .constants import SUPPORTED_TYPES
-from .exceptions import *
 import re
-from .constants import SUPPORTED_UNITS
-PATTERN = re.compile(r"^[A-Z][A-Za-z0-9]*$")
+
+from vssctl.core.constants import (
+    SUPPORTED_TYPES,
+    SUPPORTED_UNITS,
+)
+
+from vssctl.core.exceptions import (
+    ValidationError,
+    DuplicateSignalError,
+    InvalidDatatypeError,
+    InvalidParentError,
+    InvalidNameError,
+    InvalidUnitError,
+)
+
 
 class Validator:
 
+    NAME_PATTERN = re.compile(r"^[A-Z][A-Za-z0-9]*$")
+
     def validate(self, signal, catalog):
+
         self.validate_name(signal)
         self.validate_datatype(signal)
         self.validate_duplicate(signal, catalog)
@@ -14,54 +28,46 @@ class Validator:
         self.validate_description(signal)
         self.validate_unit(signal)
 
+    def validate_name(self, signal):
 
-def validate_name(self, signal):
-
-    if not PATTERN.match(signal.name):
-        raise InvalidNameError(
-            f"Invalid signal name: {signal.name}"
-        )
-
-def validate_datatype(self, signal):
-
-    if signal.datatype not in SUPPORTED_TYPES:
-
-        raise InvalidDatatypeError(
-            signal.datatype
-        )
-
-def validate_description(self, signal):
-
-    if not signal.description.strip():
-
-        raise ValidationError(
-            "Description cannot be empty."
-        )
-
-def validate_duplicate(self, signal, catalog):
-
-    for item in catalog.signals:
-
-        if (
-            item.parent == signal.parent
-            and item.name == signal.name
-        ):
-            raise DuplicateSignalError(
-                f"{signal.parent}.{signal.name}"
+        if not self.NAME_PATTERN.match(signal.name):
+            raise InvalidNameError(
+                f"Invalid signal name: {signal.name}"
             )
 
-def validate_parent(self, signal):
+    def validate_datatype(self, signal):
 
-    if not signal.parent.startswith("Vehicle"):
+        if signal.datatype not in SUPPORTED_TYPES:
+            raise InvalidDatatypeError(signal.datatype)
 
-        raise InvalidParentError(
-            signal.parent
-        )
+    def validate_duplicate(self, signal, catalog):
 
-def validate_unit(self, signal):
+        for item in catalog.signals:
 
-    if signal.unit is None:
-        return
+            if (
+                item.parent == signal.parent
+                and item.name == signal.name
+            ):
+                raise DuplicateSignalError(
+                    f"Signal '{signal.parent}.{signal.name}' already exists."
+                )
 
-    if signal.unit not in SUPPORTED_UNITS:
-        raise InvalidUnitError(signal.unit)
+    def validate_parent(self, signal):
+
+        if not signal.parent.startswith("Vehicle"):
+            raise InvalidParentError(signal.parent)
+
+    def validate_description(self, signal):
+
+        if not signal.description.strip():
+            raise ValidationError(
+                "Description cannot be empty."
+            )
+
+    def validate_unit(self, signal):
+
+        if signal.unit is None or signal.unit == "":
+            return
+
+        if signal.unit not in SUPPORTED_UNITS:
+            raise InvalidUnitError(signal.unit)

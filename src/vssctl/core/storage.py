@@ -4,7 +4,11 @@ import yaml
 
 from .models import Catalog
 
-CATALOG = Path("workspace/catalog/signals.yaml")
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
+
+CATALOG = PROJECT_ROOT / "workspace" / "catalog" / "signals.yaml"
 
 
 class Storage:
