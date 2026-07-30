@@ -28,11 +28,11 @@ class TreeNode:
 
     @property
     def is_signal(self) -> bool:
-        return self.signal is not None
+        return self.signal is not None and getattr(self.signal, "datatype", None) is not None
 
     @property
     def is_branch(self) -> bool:
-        return self.signal is None
+        return not self.is_signal
 
     @property
     def path(self) -> str:

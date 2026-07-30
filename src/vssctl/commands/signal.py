@@ -31,33 +31,43 @@ def list():
 @app.command()
 def add():
 
+    node_type = typer.prompt("Node type (signal/branch)", default="signal").lower().strip()
+
     parent = typer.prompt("Parent")
 
-    name = typer.prompt("Signal name")
-
-    datatype = typer.prompt("Datatype")
+    name = typer.prompt("Name")
 
     description = typer.prompt("Description")
 
-    unit = typer.prompt("Unit", default="")
+    if node_type == "branch":
+        signal = Signal(
+            parent=parent,
+            name=name,
+            datatype=None,
+            description=description,
+        )
+    else:
+        datatype = typer.prompt("Datatype")
 
-    signal = Signal(
-        parent=parent,
-        name=name,
-        datatype=datatype,
-        description=description,
-        unit=unit or None,
-    )
+        unit = typer.prompt("Unit", default="")
+
+        signal = Signal(
+            parent=parent,
+            name=name,
+            datatype=datatype,
+            description=description,
+            unit=unit or None,
+        )
 
     try:
 
         CatalogService().add(signal)
 
-        console.print("[green]✓ Signal added[/green]")
+        console.print("[green]Success: Node added[/green]")
 
     except ValidationError as e:
 
-        console.print(f"[red]✗ {e}[/red]")
+        console.print(f"[red]Error: {e}[/red]")
 
         raise typer.Exit(1)
 

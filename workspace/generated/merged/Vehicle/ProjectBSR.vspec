@@ -1,0 +1,8 @@
+ProjectBSR:
+  type: branch
+  description: Specific for BSR Project.
+
+ProjectBSR.SafetyStatus:
+  type: sensor
+  datatype: boolean
+  description: Indicates Project BSR safety status.

@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 class Signal(BaseModel):
     parent: str
     name: str
-    datatype: str
+    datatype: Optional[str] = None
 
     description: str = ""
 

@@ -24,7 +24,10 @@ class Generator:
             node_dict = {}
             if node.is_branch:
                 node_dict["type"] = "branch"
-                node_dict["description"] = f"Custom branch {node.name}"
+                if node.signal and getattr(node.signal, "description", ""):
+                    node_dict["description"] = node.signal.description
+                else:
+                    node_dict["description"] = f"Custom branch {node.name}"
             elif node.is_signal:
                 sig = node.signal
                 node_dict["type"] = "actuator" if getattr(sig, "writable", False) else "sensor"

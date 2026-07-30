@@ -8,7 +8,9 @@ CATALOG_DIR = WORKSPACE / "catalog"
 GENERATED_DIR = WORKSPACE / "generated"
 BUILD_DIR = WORKSPACE / "build"
 MERGED_DIR = GENERATED_DIR / "merged"
-TEAM_VSS_BASE = PROJECT_ROOT / "team_vss" / "base"
+TEAM_VSS_BASE = WORKSPACE / "templates" / "spec"
+VSS_CORE_TEMPLATES = WORKSPACE / "templates" / "vss-core"
+JSON_TREE_DIR = GENERATED_DIR / "json_tree"
 
 SIGNALS_YAML = CATALOG_DIR / "signals.yaml"
 

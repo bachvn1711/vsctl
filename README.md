@@ -425,27 +425,13 @@ Generate an in-memory VSS hierarchy.
 
 Completed
 
-VSpec Generator
+VSpec & Metadata Generator
 
-Generate:
-
-```
-company.vspec
-```
-
-Automatically.
-
----
-
-### Milestone 6
-
-Metadata Generator
-
-Run the official VSS tooling to generate:
-
-```
-vss_release_6.0.json
-```
+Features:
+- Automatic generation of `workspace/generated/company.vspec` from custom signals.
+- Preparation of merged compilation environment under `workspace/generated/merged/`.
+- Execution of the official VSS compiler (`vspec export json`) to compile VSS 6.0 specification and custom signals.
+- Programmatic synchronization of all 8 VSS release versions (from 2.0 to 6.0) in `workspace/generated/json_tree/` (adding/updating/removing custom signals while keeping original official baselines intact).
 
 ---
 

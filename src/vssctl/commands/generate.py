@@ -38,7 +38,11 @@ def run():
         
         console.print("Invoking official VSS compiler...")
         compiler.compile()
-        console.print("[green]✓ Generation successful! vss_release_6.0.json created.[/green]")
+
+        console.print("Synchronizing custom signals across all release JSON versions...")
+        compiler.sync_all_json_versions(catalog)
+
+        console.print("[green]Success! VSS release files created.[/green]")
     except Exception as e:
-        console.print(f"[red]✗ Generation failed: {e}[/red]")
+        console.print(f"[red]Error: Generation failed: {e}[/red]")
         raise typer.Exit(1)

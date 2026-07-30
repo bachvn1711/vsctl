@@ -37,6 +37,9 @@ class Validator:
 
     def validate_datatype(self, signal):
 
+        if signal.datatype is None:
+            return
+
         if signal.datatype not in SUPPORTED_TYPES:
             raise InvalidDatatypeError(signal.datatype)
 

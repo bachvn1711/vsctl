@@ -154,3 +154,14 @@ def test_empty_description():
             signal,
             catalog,
         )
+
+
+def test_valid_branch():
+    catalog = Catalog()
+    signal = Signal(
+        parent="Vehicle.ADAS",
+        name="CustomBranch",
+        datatype=None,
+        description="A custom branch description",
+    )
+    validator.validate(signal, catalog)

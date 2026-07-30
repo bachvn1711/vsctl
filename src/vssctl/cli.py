@@ -5,6 +5,8 @@ import typer
 from vssctl.commands import doctor
 from vssctl.commands import signal
 from vssctl.commands import generate
+from vssctl.commands import build
+from vssctl.commands import publish
 
 app = typer.Typer(
     name="vssctl",
@@ -20,8 +22,10 @@ app.add_typer(
 )
 
 # Register standalone commands
-app.command(help="Check local environment")(doctor.run)
+app.command(name="doctor", help="Check local environment")(doctor.run)
 app.command(name="generate", help="Generate VSS project and compile")(generate.run)
+app.command(name="build", help="Build Databroker Docker/Podman image")(build.run)
+app.command(name="publish", help="Publish Databroker image to GHCR")(publish.run)
 
 def main():
     app()
