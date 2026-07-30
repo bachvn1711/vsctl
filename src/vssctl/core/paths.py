@@ -7,6 +7,8 @@ WORKSPACE = PROJECT_ROOT / "workspace"
 CATALOG_DIR = WORKSPACE / "catalog"
 GENERATED_DIR = WORKSPACE / "generated"
 BUILD_DIR = WORKSPACE / "build"
+MERGED_DIR = GENERATED_DIR / "merged"
+TEAM_VSS_BASE = PROJECT_ROOT / "team_vss" / "base"
 
 SIGNALS_YAML = CATALOG_DIR / "signals.yaml"
 

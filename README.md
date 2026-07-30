@@ -423,6 +423,8 @@ Generate an in-memory VSS hierarchy.
 
 ### Milestone 5
 
+Completed
+
 VSpec Generator
 
 Generate:

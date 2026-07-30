@@ -1,0 +1,11 @@
+Vehicle.ADAS:
+  type: branch
+  description: Custom branch ADAS
+Vehicle.ADAS.Speed:
+  type: sensor
+  datatype: float
+  description: Vehicle Speed
+Vehicle.ADAS.Enabled:
+  type: sensor
+  datatype: boolean
+  description: ADAS enabled

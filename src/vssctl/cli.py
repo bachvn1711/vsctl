@@ -4,6 +4,7 @@ import typer
 
 from vssctl.commands import doctor
 from vssctl.commands import signal
+from vssctl.commands import generate
 
 app = typer.Typer(
     name="vssctl",
@@ -20,7 +21,7 @@ app.add_typer(
 
 # Register standalone commands
 app.command(help="Check local environment")(doctor.run)
-
+app.command(name="generate", help="Generate VSS project and compile")(generate.run)
 
 def main():
     app()
