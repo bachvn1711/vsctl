@@ -31,7 +31,11 @@ def list():
 @app.command()
 def add():
 
-    node_type = typer.prompt("Node type (signal/branch)", default="signal").lower().strip()
+    while True:
+        node_type = typer.prompt("Node type (signal/branch)", default="signal").lower().strip()
+        if node_type in ("signal", "branch"):
+            break
+        console.print("[red]Error: Invalid choice. You must enter either 'signal' or 'branch'.[/red]")
 
     parent = typer.prompt("Parent")
 
