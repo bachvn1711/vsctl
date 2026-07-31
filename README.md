@@ -538,6 +538,91 @@ This provides a consistent, reproducible, and maintainable workflow for teams ad
 
 ---
 
+# Developer Guide
+
+This section explains how to set up `vssctl` locally, configure default behaviors, enable shell completions, and understand CI/CD pipeline behaviors.
+
+## Local Configuration (`.vssctl.yaml`)
+
+`vssctl` supports loading workspace-wide and developer-specific settings from a configuration file. The tool searches for `.vssctl.yaml` in the following locations (highest priority first):
+1. An explicit file path specified by the `--config <path>` global option.
+2. The project workspace root directory (`.vssctl.yaml`).
+3. The user's home directory (`$HOME/.vssctl.yaml`).
+
+### Example Configuration
+
+Create a file named `.vssctl.yaml` with the following structure:
+
+```yaml
+workspace:
+  databroker_path: "workspace/databroker"
+  output_dir: "workspace/output"
+defaults:
+  engine: "auto"       # auto | podman | docker
+  ghcr_org: "bachvn1711"
+  vss_version: "6.0"
+```
+
+## Shell Autocompletion
+
+`vssctl` provides native shell tab-completion script generation for `bash`, `zsh`, and `fish`.
+
+### Generation
+
+To generate the completion script for your active shell, run:
+
+```bash
+vssctl completion [bash|zsh|fish]
+```
+
+### Installation
+
+For **Bash**, add the following line to your `~/.bashrc`:
+
+```bash
+eval "$(vssctl completion bash)"
+```
+
+For **Zsh**, add the following line to your `~/.zshrc`:
+
+```bash
+eval "$(vssctl completion zsh)"
+```
+
+For **Fish**, add the following line to your `~/.config/fish/config.fish`:
+
+```fish
+vssctl completion fish | source
+```
+
+---
+
+## Local Pipeline Workflow
+
+To execute all local compilation steps (validation, spec generation, container assembly, and optional registry publishing) in a single command, use:
+
+```bash
+# Run validation, generate JSON, and build Podman/Docker image
+vssctl pipeline
+
+# Run the complete sequence and publish directly to GHCR
+vssctl pipeline --publish --token <your-github-pat>
+```
+
+---
+
+## CI/CD Pipeline & GitHub Actions Workflow
+
+When pushing commits or releases to GitHub, the automated pipeline in `.github/workflows/release.yml` performs the following steps:
+
+1. **Triggers:** Fires on pushes to `main`/`master`, pushes to release version tags (matching `v*.*.*`), or manual dispatches (`workflow_dispatch`).
+2. **Testing:** Executes the complete Python `pytest` test suite to check for command correctness and exceptions.
+3. **Validation & Generation:** Runs `vssctl validate` to verify VSS specifications, then generates versioned release schemas (`vss_release_6.0.json`).
+4. **Publishing (GHCR):** Logs into GHCR, builds the Databroker container using the generated VSS spec, tags it with the branch/tag version, and pushes it to `ghcr.io/bachvn1711/databroker`.
+5. **Release Assets:** When a release tag `v*.*.*` is pushed, the workflow creates a new GitHub Release and attaches the generated `vss_release_6.0.json` metadata JSON as download artifacts.
+
+---
+
 # License
 
 Apache License 2.0

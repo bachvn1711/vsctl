@@ -1,0 +1,80 @@
+name: CI/CD Release Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  test-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest pyyaml pydantic jinja2 rich typer[all]
+          pip install -e .
+
+      - name: Run Pytest Suite
+        run: |
+          pytest tests/
+
+      - name: Validate VSS Specs
+        run: |
+          vssctl validate
+
+      - name: Generate VSS Metadata JSON
+        run: |
+          vssctl generate --version 6.0
+
+      - name: Set up QEMU (for multi-arch support if needed)
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and Push Databroker Container to GHCR
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Use the tag name or branch name for the container image tag
+          IMAGE_TAG="${{ github.ref_name }}"
+          # Replace slash with dash for branch names containing slashes
+          IMAGE_TAG=$(echo "$IMAGE_TAG" | sed 's/\//-/g')
+          
+          vssctl build \
+            -f workspace/generated/vss_release_6.0.json \
+            -t ghcr.io/bachvn1711/databroker:$IMAGE_TAG \
+            --publish \
+            --username bachvn1711 \
+            --token "$GHCR_TOKEN" \
+            --engine docker
+
+      - name: Create GitHub Release and Attach Artifacts
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            workspace/generated/vss_release_6.0.json
+            workspace/generated/json_tree/vss_release_*.json
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -8,19 +8,3 @@ signals:
   writable: false
   minimum: null
   maximum: null
-- parent: Vehicle.AUTONXTAI
-  name: Cabin
-  datatype: null
-  description: Branch for CABIN of AUTONXT vCAR
-  unit: null
-  writable: false
-  minimum: null
-  maximum: null
-- parent: Vehicle.AUTONXTAI.Cabin
-  name: Temperature
-  datatype: float
-  description: Temp of the car
-  unit: null
-  writable: false
-  minimum: null
-  maximum: null

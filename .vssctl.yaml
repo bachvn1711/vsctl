@@ -1,0 +1,7 @@
+workspace:
+  databroker_path: "workspace/databroker"
+  output_dir: "workspace/output"
+defaults:
+  engine: "auto"
+  ghcr_org: "bachvn1711"
+  vss_version: "6.0"

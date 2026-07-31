@@ -2,6 +2,7 @@ import subprocess
 import shutil
 import sys
 from pathlib import Path
+from typing import Optional
 
 from vssctl.core import paths
 
@@ -34,7 +35,7 @@ class Compiler:
         if paths.COMPANY_VSPEC.exists():
             shutil.copy2(paths.COMPANY_VSPEC, paths.MERGED_DIR / paths.COMPANY_VSPEC.name)
 
-    def compile(self) -> None:
+    def compile(self, output_path: Optional[Path] = None) -> None:
         """
         Invokes the official vspec compiler to generate the JSON.
         """
@@ -73,8 +74,9 @@ class Compiler:
             cmd.extend(["-s", str(merged_company_vspec)])
 
         # Ensure output directory exists
-        paths.METADATA_JSON.parent.mkdir(parents=True, exist_ok=True)
-        cmd.extend(["-o", str(paths.METADATA_JSON)])
+        target_path = output_path or paths.METADATA_JSON
+        target_path.parent.mkdir(parents=True, exist_ok=True)
+        cmd.extend(["-o", str(target_path)])
 
         try:
             subprocess.run(cmd, check=True, capture_output=True, text=True)
