@@ -40,9 +40,9 @@ class CatalogService:
                 "seats": "Seat", "seat": "Seat",
                 "windows": "Window", "window": "Window",
                 "wipers": "Wiper", "wiper": "Wiper",
-                "mirrors": "Mirror", "mirror": "Mirror",
             }
             plurals = {
+                "mirror": "Mirrors", "mirrors": "Mirrors",
                 "interiorlight": "InteriorLights", "interiorlights": "InteriorLights",
                 "exteriormirror": "ExteriorMirrors", "exteriormirrors": "ExteriorMirrors",
                 "signalinglight": "SignalingLights", "signalinglights": "SignalingLights",

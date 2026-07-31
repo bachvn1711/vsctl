@@ -152,9 +152,12 @@ def test_parent_wheels_normalization():
     sig_door = Signal(parent="Vehicle.Cabin.Doors.Row1", name="IsLocked", datatype="boolean", description="Door status")
     assert sig_door.parent == "Vehicle.Cabin.Door.Row1"
 
-    # Test singular -> plural normalization (e.g. InteriorLight -> InteriorLights)
+    # Test singular -> plural normalization (e.g. InteriorLight -> InteriorLights, mirror -> Mirrors)
     sig_light = Signal(parent="Vehicle.Cabin.InteriorLight", name="Brightness", datatype="uint8", description="Light brightness")
     assert sig_light.parent == "Vehicle.Cabin.InteriorLights"
+
+    sig_mirror = Signal(parent="Vehicle.Body.mirror.DriverSide", name="Steer", datatype="float", description="Mirrors")
+    assert sig_mirror.parent == "Vehicle.Body.Mirrors.DriverSide"
 
     sig_brake = Signal(parent="Vehicle.Body.brakelight", name="IsActive", datatype="boolean", description="Brake light status")
     assert sig_brake.parent == "Vehicle.Body.BrakeLights"

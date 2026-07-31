@@ -37,12 +37,12 @@ class Signal(BaseModel):
                 "window": "Window",
                 "wipers": "Wiper",
                 "wiper": "Wiper",
-                "mirrors": "Mirror",
-                "mirror": "Mirror",
             }
             
             # Plural standard mapping
             plurals = {
+                "mirror": "Mirrors",
+                "mirrors": "Mirrors",
                 "interiorlight": "InteriorLights",
                 "interiorlights": "InteriorLights",
                 "exteriormirror": "ExteriorMirrors",

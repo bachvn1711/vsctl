@@ -73,9 +73,14 @@ class Validator:
 
     def validate_name(self, signal):
         if not self.NAME_PATTERN.match(signal.name):
-            raise InvalidNameError(
-                f"Invalid signal name: {signal.name}"
-            )
+            if signal.datatype is None:
+                raise InvalidNameError(
+                    f"Invalid branch name: {signal.name}"
+                )
+            else:
+                raise InvalidNameError(
+                    f"Invalid signal name: {signal.name}"
+                )
 
     def validate_datatype(self, signal):
         if signal.datatype is None:
