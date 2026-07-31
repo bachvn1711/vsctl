@@ -6,7 +6,7 @@ import typer
 
 from vssctl.config import settings, Config
 from vssctl.commands import validate, completion, pipeline
-from vssctl.core.models import Signal
+from vssctl.core.models import Signal, Catalog
 
 
 def test_config_default_values():
@@ -195,3 +195,27 @@ def test_generate_all_versions(mock_compiler_class, mock_generator_class, mock_t
         mock_compiler.sync_all_json_versions.assert_called_once_with(mock_catalog)
     finally:
         settings.output_dir = original_output_dir
+
+
+def test_validator_parent_existence():
+    from vssctl.core.validator import Validator
+    from vssctl.core.exceptions import InvalidParentError
+    
+    validator = Validator()
+    catalog = Catalog()
+    
+    # 1. Valid parent that exists in VSS baseline (e.g. Vehicle.ADAS)
+    sig_valid = Signal(parent="Vehicle.ADAS", name="RPM", datatype="int32", description="RPM")
+    validator.validate(sig_valid, catalog) # Should pass
+    
+    # 2. Invalid parent that does not exist anywhere (e.g. Vehicle.ADAS.Wheel)
+    sig_invalid = Signal(parent="Vehicle.ADAS.Wheel", name="Right", datatype="float", description="Right")
+    with pytest.raises(InvalidParentError):
+        validator.validate(sig_invalid, catalog)
+        
+    # 3. Adding custom branch to catalog, making the parent valid
+    branch_signal = Signal(parent="Vehicle.ADAS", name="Wheel", datatype=None, description="Custom branch")
+    catalog.signals.append(branch_signal)
+    
+    # Should validate successfully now that Vehicle.ADAS.Wheel exists in custom branches
+    validator.validate(sig_invalid, catalog)

@@ -38,7 +38,7 @@ def run():
         try:
             validator.validate_name(signal)
             validator.validate_datatype(signal)
-            validator.validate_parent(signal)
+            validator.validate_parent(signal, service.catalog)
             validator.validate_description(signal)
             validator.validate_unit(signal)
         except Exception as err:
