@@ -46,6 +46,11 @@ jobs:
         run: |
           vssctl generate --version 6.0
 
+      - name: Clone Kuksa Databroker Repository
+        run: |
+          mkdir -p workspace/databroker
+          git clone --recursive https://github.com/eclipse-kuksa/kuksa-databroker.git workspace/databroker/kuksa-databroker
+
       - name: Set up QEMU (for multi-arch support if needed)
         uses: docker/setup-qemu-action@v3
 
