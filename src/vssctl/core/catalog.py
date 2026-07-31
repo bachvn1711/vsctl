@@ -29,11 +29,35 @@ class CatalogService:
         self.storage.save(self.catalog)
 
     def remove(self, parent: str, name: str):
-        # Normalize the parent parameter to support "Wheels" -> "Wheel" matching
+        # Normalize the parent parameter to support full VSS singular/plural matching
         parent_norm = parent
         if parent:
             parts = parent.split(".")
-            parent_norm = ".".join(["Wheel" if p.lower() == "wheels" else p for p in parts])
+            normalized = []
+            singulars = {
+                "wheels": "Wheel", "wheel": "Wheel",
+                "doors": "Door", "door": "Door",
+                "seats": "Seat", "seat": "Seat",
+                "windows": "Window", "window": "Window",
+                "wipers": "Wiper", "wiper": "Wiper",
+                "mirrors": "Mirror", "mirror": "Mirror",
+            }
+            plurals = {
+                "interiorlight": "InteriorLights", "interiorlights": "InteriorLights",
+                "exteriormirror": "ExteriorMirrors", "exteriormirrors": "ExteriorMirrors",
+                "signalinglight": "SignalingLights", "signalinglights": "SignalingLights",
+                "brakelight": "BrakeLights", "brakelights": "BrakeLights",
+                "staticlight": "StaticLights", "staticlights": "StaticLights",
+            }
+            for part in parts:
+                l_part = part.lower()
+                if l_part in singulars:
+                    normalized.append(singulars[l_part])
+                elif l_part in plurals:
+                    normalized.append(plurals[l_part])
+                else:
+                    normalized.append(part)
+            parent_norm = ".".join(normalized)
 
         self.catalog.signals = [
 

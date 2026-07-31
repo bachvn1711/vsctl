@@ -20,13 +20,47 @@ class Signal(BaseModel):
 
     @field_validator("parent", mode="before")
     @classmethod
-    def normalize_parent_wheels(cls, v: str) -> str:
+    def normalize_parent_path_spelling(cls, v: str) -> str:
         if isinstance(v, str):
             parts = v.split(".")
             normalized = []
+            
+            # Singular standard mapping
+            singulars = {
+                "wheels": "Wheel",
+                "wheel": "Wheel",
+                "doors": "Door",
+                "door": "Door",
+                "seats": "Seat",
+                "seat": "Seat",
+                "windows": "Window",
+                "window": "Window",
+                "wipers": "Wiper",
+                "wiper": "Wiper",
+                "mirrors": "Mirror",
+                "mirror": "Mirror",
+            }
+            
+            # Plural standard mapping
+            plurals = {
+                "interiorlight": "InteriorLights",
+                "interiorlights": "InteriorLights",
+                "exteriormirror": "ExteriorMirrors",
+                "exteriormirrors": "ExteriorMirrors",
+                "signalinglight": "SignalingLights",
+                "signalinglights": "SignalingLights",
+                "brakelight": "BrakeLights",
+                "brakelights": "BrakeLights",
+                "staticlight": "StaticLights",
+                "staticlights": "StaticLights",
+            }
+            
             for part in parts:
-                if part.lower() == "wheels":
-                    normalized.append("Wheel")
+                l_part = part.lower()
+                if l_part in singulars:
+                    normalized.append(singulars[l_part])
+                elif l_part in plurals:
+                    normalized.append(plurals[l_part])
                 else:
                     normalized.append(part)
             return ".".join(normalized)

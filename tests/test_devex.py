@@ -145,9 +145,20 @@ def test_pipeline_workflow(mock_build, mock_generate, mock_validate):
 
 
 def test_parent_wheels_normalization():
+    # Test plural -> singular normalization (e.g. Wheels -> Wheel, Doors -> Door)
     sig = Signal(parent="Vehicle.Chassis.Wheels", name="SteerAngle", datatype="int16", description="Angle")
     assert sig.parent == "Vehicle.Chassis.Wheel"
     
+    sig_door = Signal(parent="Vehicle.Cabin.Doors.Row1", name="IsLocked", datatype="boolean", description="Door status")
+    assert sig_door.parent == "Vehicle.Cabin.Door.Row1"
+
+    # Test singular -> plural normalization (e.g. InteriorLight -> InteriorLights)
+    sig_light = Signal(parent="Vehicle.Cabin.InteriorLight", name="Brightness", datatype="uint8", description="Light brightness")
+    assert sig_light.parent == "Vehicle.Cabin.InteriorLights"
+
+    sig_brake = Signal(parent="Vehicle.Body.brakelight", name="IsActive", datatype="boolean", description="Brake light status")
+    assert sig_brake.parent == "Vehicle.Body.BrakeLights"
+
     # Test lowercase wheels
     sig2 = Signal(parent="Vehicle.wheels.FrontLeft", name="SteerAngle", datatype="int16", description="Angle")
     assert sig2.parent == "Vehicle.Wheel.FrontLeft"
