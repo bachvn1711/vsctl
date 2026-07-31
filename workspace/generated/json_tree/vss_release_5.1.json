@@ -285,23 +285,6 @@
         "description": "All Advanced Driver Assist Systems data.",
         "type": "branch"
       },
-      "AUTONXTAI": {
-        "children": {
-          "Cabin": {
-            "children": {
-              "Temperature": {
-                "datatype": "float",
-                "description": "Temp of the car",
-                "type": "sensor"
-              }
-            },
-            "description": "Custom branch Cabin",
-            "type": "branch"
-          }
-        },
-        "description": "Custom branch AUTONXTAI",
-        "type": "branch"
-      },
       "Acceleration": {
         "children": {
           "Lateral": {

@@ -325,23 +325,6 @@
         "type": "branch",
         "uuid": "14c2b2e1297b513197d320a5ce58f42e"
       },
-      "AUTONXTAI": {
-        "children": {
-          "Cabin": {
-            "children": {
-              "Temperature": {
-                "datatype": "float",
-                "description": "Temp of the car",
-                "type": "sensor"
-              }
-            },
-            "description": "Custom branch Cabin",
-            "type": "branch"
-          }
-        },
-        "description": "Custom branch AUTONXTAI",
-        "type": "branch"
-      },
       "Acceleration": {
         "children": {
           "Lateral": {

@@ -5,13 +5,3 @@ Vehicle.ADAS.RPM:
   type: sensor
   datatype: int32
   description: Engine RPM
-Vehicle.AUTONXTAI:
-  type: branch
-  description: Custom branch AUTONXTAI
-Vehicle.AUTONXTAI.Cabin:
-  type: branch
-  description: Branch for CABIN of AUTONXT vCAR
-Vehicle.AUTONXTAI.Cabin.Temperature:
-  type: sensor
-  datatype: float
-  description: Temp of the car
