@@ -49,11 +49,18 @@ workspace/
 ## 3. Installation & Getting Started
 
 ### Prerequisites
-- **Python 3.10+** (tested up to 3.11)
-- **Container engine** (Podman is preferred and checked first, or Docker)
+- **Python 3.10+** (tested up to 3.11; `python3` on Linux)
+- **Container engine** (Podman or Docker).
+  - *Linux note:* Podman runs rootless by default. If using Docker, ensure your user is in the `docker` group to run commands without `sudo`:
+    ```bash
+    sudo usermod -aG docker $USER
+    newgrp docker
+    ```
 - **Git**
 
 ### Local Setup
+
+#### On Windows:
 1. Create and activate a Python virtual environment:
    ```bash
    python -m venv .venv_win
@@ -64,7 +71,28 @@ workspace/
    pip install --upgrade pip
    pip install -e .
    ```
-3. Run the local environment doctor to verify dependencies and container runtime engines:
+3. Run the local environment doctor to verify dependencies and container engines:
+   ```bash
+   vssctl doctor
+   ```
+
+#### On Linux:
+1. Install Python virtualenv and system dependencies (Debian/Ubuntu example):
+   ```bash
+   sudo apt-get update
+   sudo apt-get install python3-pip python3-venv git
+   ```
+2. Create and activate a Python virtual environment:
+   ```bash
+   python3 -m venv .venv
+   source .venv/bin/activate
+   ```
+3. Install the package in editable mode with development dependencies:
+   ```bash
+   pip install --upgrade pip
+   pip install -e .
+   ```
+4. Run the local environment doctor to verify dependencies:
    ```bash
    vssctl doctor
    ```
