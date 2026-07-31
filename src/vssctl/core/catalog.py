@@ -29,6 +29,11 @@ class CatalogService:
         self.storage.save(self.catalog)
 
     def remove(self, parent: str, name: str):
+        # Normalize the parent parameter to support "Wheels" -> "Wheel" matching
+        parent_norm = parent
+        if parent:
+            parts = parent.split(".")
+            parent_norm = ".".join(["Wheel" if p.lower() == "wheels" else p for p in parts])
 
         self.catalog.signals = [
 
@@ -36,7 +41,7 @@ class CatalogService:
 
             for s in self.catalog.signals
 
-            if not (s.parent == parent and s.name == name)
+            if not (s.parent == parent_norm and s.name == name)
 
         ]
 

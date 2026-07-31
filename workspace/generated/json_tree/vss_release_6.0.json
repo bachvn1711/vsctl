@@ -6385,6 +6385,17 @@
             "description": "Steering wheel signals",
             "type": "branch"
           },
+          "Wheel": {
+            "children": {
+              "SteeringAngle": {
+                "datatype": "float",
+                "description": "Angle of wheels",
+                "type": "sensor"
+              }
+            },
+            "description": "Custom branch Wheel",
+            "type": "branch"
+          },
           "Wheelbase": {
             "datatype": "uint16",
             "default": 0,

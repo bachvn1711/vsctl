@@ -25,7 +25,10 @@ class Config:
         """
         search_paths = []
         if path:
-            search_paths.append(Path(path))
+            from vssctl.core.paths import resolve_path_gracefully
+            resolved = resolve_path_gracefully(path)
+            if resolved:
+                search_paths.append(resolved)
         
         # Resolve project root relative to this file (vssctl/src/vssctl/config.py)
         # parents[2] gets the folder holding 'src' (project root)

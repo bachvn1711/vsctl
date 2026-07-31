@@ -198,7 +198,12 @@ def run(
 
     # 2. Resolve databroker directory
     if databroker_dir is None:
-        databroker_dir = paths.WORKSPACE / "databroker"
+        from vssctl.config import settings
+        databroker_dir = paths.resolve_path_gracefully(settings.databroker_path)
+        if databroker_dir is None:
+            databroker_dir = paths.WORKSPACE / "databroker"
+    else:
+        databroker_dir = paths.resolve_path_gracefully(databroker_dir)
     build_context = find_build_context(databroker_dir)
     console.print(f"Databroker directory: [cyan]{build_context}[/cyan]")
 
@@ -206,9 +211,9 @@ def run(
     if vss_file is None:
         resolved_vss_file = find_latest_vss_file()
     else:
-        resolved_vss_file = Path(vss_file)
-        if not resolved_vss_file.exists():
-            console.print(f"[red]Error: VSS file not found at '{resolved_vss_file}'[/red]")
+        resolved_vss_file = paths.resolve_path_gracefully(vss_file)
+        if not resolved_vss_file or not resolved_vss_file.exists():
+            console.print(f"[red]Error: VSS file not found at '{vss_file}'[/red]")
             raise typer.Exit(1)
     console.print(f"Metadata file: [cyan]{resolved_vss_file}[/cyan]")
 

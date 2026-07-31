@@ -1,6 +1,6 @@
 from typing import Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 class Signal(BaseModel):
@@ -17,6 +17,20 @@ class Signal(BaseModel):
     minimum: Optional[float] = None
 
     maximum: Optional[float] = None
+
+    @field_validator("parent", mode="before")
+    @classmethod
+    def normalize_parent_wheels(cls, v: str) -> str:
+        if isinstance(v, str):
+            parts = v.split(".")
+            normalized = []
+            for part in parts:
+                if part.lower() == "wheels":
+                    normalized.append("Wheel")
+                else:
+                    normalized.append(part)
+            return ".".join(normalized)
+        return v
 
 
 class Catalog(BaseModel):

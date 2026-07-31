@@ -142,3 +142,45 @@ def test_pipeline_workflow(mock_build, mock_generate, mock_validate):
         remote_tag="remtag",
         skip_login=True,
     )
+
+
+def test_parent_wheels_normalization():
+    sig = Signal(parent="Vehicle.Chassis.Wheels", name="SteerAngle", datatype="int16", description="Angle")
+    assert sig.parent == "Vehicle.Chassis.Wheel"
+    
+    # Test lowercase wheels
+    sig2 = Signal(parent="Vehicle.wheels.FrontLeft", name="SteerAngle", datatype="int16", description="Angle")
+    assert sig2.parent == "Vehicle.Wheel.FrontLeft"
+
+    # Test normal unchanged
+    sig3 = Signal(parent="Vehicle.Cabin", name="DoorCount", datatype="uint8", description="Doors")
+    assert sig3.parent == "Vehicle.Cabin"
+
+
+@patch("vssctl.commands.generate.CatalogService")
+@patch("vssctl.commands.generate.TreeBuilder")
+@patch("vssctl.commands.generate.Generator")
+@patch("vssctl.commands.generate.Compiler")
+def test_generate_all_versions(mock_compiler_class, mock_generator_class, mock_tree_class, mock_catalog_class, tmp_path):
+    mock_catalog = MagicMock()
+    mock_catalog_class.return_value.catalog = mock_catalog
+    
+    mock_compiler = MagicMock()
+    mock_compiler_class.return_value = mock_compiler
+    
+    # Mock settings.output_dir to use a temp dir
+    from vssctl.config import settings
+    original_output_dir = settings.output_dir
+    settings.output_dir = str(tmp_path)
+    
+    try:
+        from vssctl.commands import generate
+        # Run generate without arguments
+        generate.run(version=None)
+        
+        # Verify compiler.compile was called with the default 6.0 path
+        mock_compiler.compile.assert_called_once()
+        # Verify sync_all_json_versions was called with catalog
+        mock_compiler.sync_all_json_versions.assert_called_once_with(mock_catalog)
+    finally:
+        settings.output_dir = original_output_dir
