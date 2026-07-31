@@ -8,19 +8,18 @@ from vssctl.core.storage import Storage
 
 
 def clean_catalog():
-    path = Path("workspace/catalog/signals.yaml")
-
-    path.parent.mkdir(parents=True, exist_ok=True)
-
-    with open(path, "w") as f:
-        yaml.safe_dump(
-            {
-                "version": "0.1",
-                "signals": [],
-            },
-            f,
-            sort_keys=False,
-        )
+    for name in ("signals.yaml", "signals-custom.yaml", "signals-base.yaml"):
+        path = Path("workspace/catalog") / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with open(path, "w") as f:
+            yaml.safe_dump(
+                {
+                    "version": "0.1",
+                    "signals": [],
+                },
+                f,
+                sort_keys=False,
+            )
 
 
 def test_add_signal():

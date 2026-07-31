@@ -105,6 +105,18 @@ class Validator:
 
         baseline_paths = get_baseline_paths()
 
+        # Check branches in signals-base.yaml if they exist
+        base_branches = set()
+        try:
+            from vssctl.core.storage import Storage
+            base_cat = Storage().load_base()
+            if base_cat and base_cat.signals:
+                for item in base_cat.signals:
+                    if item.datatype is None:
+                        base_branches.add(f"{item.parent}.{item.name}")
+        except Exception:
+            pass
+
         # Compute custom branch paths explicitly declared in catalog (datatype is None)
         custom_branches = set()
         if catalog and catalog.signals:
@@ -112,8 +124,12 @@ class Validator:
                 if item.datatype is None:
                     custom_branches.add(f"{item.parent}.{item.name}")
 
-        # The parent path must exist in baseline_paths or custom_branches
-        if signal.parent not in baseline_paths and signal.parent not in custom_branches:
+        # The parent path must exist in baseline_paths or base_branches or custom_branches
+        if (
+            signal.parent not in baseline_paths
+            and signal.parent not in base_branches
+            and signal.parent not in custom_branches
+        ):
             if signal.parent != "Vehicle":
                 raise InvalidParentError(
                     f"Parent path '{signal.parent}' does not exist in VSS baseline or custom branches catalog."

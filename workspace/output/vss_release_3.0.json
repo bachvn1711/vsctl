@@ -286,6 +286,17 @@
             "description": "Traction Control System signals.",
             "type": "branch",
             "uuid": "0572e9f6b1aa5fb5b2f68086aff05073"
+          },
+          "Wheel": {
+            "children": {
+              "Right": {
+                "datatype": "float",
+                "description": "aa",
+                "type": "sensor"
+              }
+            },
+            "description": "Custom branch Wheel",
+            "type": "branch"
           }
         },
         "description": "All Advanced Driver Assist Systems data.",
@@ -5111,17 +5122,6 @@
             "type": "attribute",
             "unit": "mm",
             "uuid": "f66cc4e6d7cf5e1da0d58af902dbb36b"
-          },
-          "Wheel": {
-            "children": {
-              "SteeringAngle": {
-                "datatype": "float",
-                "description": "Angle of wheels",
-                "type": "sensor"
-              }
-            },
-            "description": "Custom branch Wheel",
-            "type": "branch"
           },
           "Wheelbase": {
             "datatype": "uint16",

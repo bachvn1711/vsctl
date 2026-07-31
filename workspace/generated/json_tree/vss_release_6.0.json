@@ -564,6 +564,17 @@
             },
             "description": "Traction Control System signals.",
             "type": "branch"
+          },
+          "Wheel": {
+            "children": {
+              "Right": {
+                "datatype": "float",
+                "description": "aa",
+                "type": "sensor"
+              }
+            },
+            "description": "Custom branch Wheel",
+            "type": "branch"
           }
         },
         "description": "All Advanced Driver Assist Systems data.",
@@ -6383,17 +6394,6 @@
               }
             },
             "description": "Steering wheel signals",
-            "type": "branch"
-          },
-          "Wheel": {
-            "children": {
-              "SteeringAngle": {
-                "datatype": "float",
-                "description": "Angle of wheels",
-                "type": "sensor"
-              }
-            },
-            "description": "Custom branch Wheel",
             "type": "branch"
           },
           "Wheelbase": {

@@ -5,13 +5,10 @@ Vehicle.ADAS.RPM:
   type: sensor
   datatype: int32
   description: Engine RPM
-Vehicle.Chassis:
+Vehicle.ADAS.Wheel:
   type: branch
-  description: Custom branch Chassis
-Vehicle.Chassis.Wheel:
-  type: branch
-  description: Custom branch Wheel
-Vehicle.Chassis.Wheel.SteeringAngle:
+  description: test
+Vehicle.ADAS.Wheel.Right:
   type: sensor
   datatype: float
-  description: Angle of wheels
+  description: aa

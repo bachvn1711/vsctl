@@ -13,13 +13,33 @@ console = Console()
 @app.command()
 def list():
     service = CatalogService()
-    signals = service.list()
+    custom_signals = service.list()
+    
+    base_signals = []
+    try:
+        base_signals = service.storage.load_base().signals
+    except Exception:
+        pass
+        
+    # Merge base and custom signals to display a unified view to developers
+    all_signals = []
+    seen = set()
+    for s in base_signals:
+        path = f"{s.parent}.{s.name}"
+        if path not in seen:
+            seen.add(path)
+            all_signals.append(s)
+    for s in custom_signals:
+        path = f"{s.parent}.{s.name}"
+        if path not in seen:
+            seen.add(path)
+            all_signals.append(s)
 
-    if not signals:
+    if not all_signals:
         console.print("[yellow]No signals found.[/yellow]")
         return
 
-    for signal in signals:
+    for signal in all_signals:
         console.print(
             f"{signal.parent}.{signal.name}"
         )
@@ -191,9 +211,9 @@ def update(
                     recurse(val["children"], current_path)
     recurse(data)
     
-    service = CatalogService()
-    existing_signals = service.list()
-    existing_keys = {(s.parent, s.name) for s in existing_signals}
+    from vssctl.core.models import Catalog
+    base_catalog = Catalog()
+    existing_keys = set()
     
     added_count = 0
     for b in branches:
@@ -205,12 +225,13 @@ def update(
                 datatype=None,
                 description=b["description"]
             )
-            service.catalog.signals.append(sig)
+            base_catalog.signals.append(sig)
             existing_keys.add(key)
             added_count += 1
             
     if added_count > 0:
-        service.storage.save(service.catalog)
-        console.print(f"[green]Success: Catalog updated! Added {added_count} baseline branches to signals.yaml.[/green]")
+        service = CatalogService()
+        service.storage.save_base(base_catalog)
+        console.print(f"[green]Success: Catalog updated! Generated signals-base.yaml with {added_count} baseline branches for version {version}.[/green]")
     else:
-        console.print("[yellow]Catalog is already up to date with baseline branches.[/yellow]")
+        console.print("[yellow]No branches found in baseline JSON to add.[/yellow]")

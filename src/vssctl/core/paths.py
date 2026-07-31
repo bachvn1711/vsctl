@@ -14,7 +14,9 @@ TEAM_VSS_BASE = WORKSPACE / "templates" / "spec"
 VSS_CORE_TEMPLATES = WORKSPACE / "templates" / "vss-core"
 JSON_TREE_DIR = GENERATED_DIR / "json_tree"
 
-SIGNALS_YAML = CATALOG_DIR / "signals.yaml"
+SIGNALS_BASE_YAML = CATALOG_DIR / "signals-base.yaml"
+SIGNALS_CUSTOM_YAML = CATALOG_DIR / "signals-custom.yaml"
+SIGNALS_YAML = SIGNALS_CUSTOM_YAML
 
 TREE_JSON = GENERATED_DIR / "tree.json"
 COMPANY_VSPEC = GENERATED_DIR / "company.vspec"

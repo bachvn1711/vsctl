@@ -1,10 +1,2 @@
 version: '0.1'
-signals:
-- parent: Vehicle.ADAS
-  name: RPM
-  datatype: int32
-  description: Engine RPM
-  unit: null
-  writable: false
-  minimum: null
-  maximum: null
+signals: []
