@@ -1,0 +1,6 @@
+typer[all]
+rich
+pyyaml
+pydantic>=2
+jinja2
+vss-tools
