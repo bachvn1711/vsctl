@@ -3,6 +3,7 @@ README.md
 pyproject.toml
 src/vssctl/__init__.py
 src/vssctl/cli.py
+src/vssctl/config.py
 src/vssctl.egg-info/PKG-INFO
 src/vssctl.egg-info/SOURCES.txt
 src/vssctl.egg-info/dependency_links.txt
@@ -10,9 +11,13 @@ src/vssctl.egg-info/entry_points.txt
 src/vssctl.egg-info/requires.txt
 src/vssctl.egg-info/top_level.txt
 src/vssctl/commands/build.py
+src/vssctl/commands/completion.py
 src/vssctl/commands/doctor.py
 src/vssctl/commands/generate.py
+src/vssctl/commands/pipeline.py
+src/vssctl/commands/publish.py
 src/vssctl/commands/signal.py
+src/vssctl/commands/validate.py
 src/vssctl/core/catalog.py
 src/vssctl/core/compiler.py
 src/vssctl/core/constants.py
@@ -26,7 +31,10 @@ src/vssctl/core/storage.py
 src/vssctl/core/tree.py
 src/vssctl/core/tree_builder.py
 src/vssctl/core/validator.py
+tests/test_build.py
 tests/test_catalog.py
 tests/test_compiler.py
+tests/test_devex.py
 tests/test_generator.py
+tests/test_publish.py
 tests/test_validator.py
