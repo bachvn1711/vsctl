@@ -1,4 +1,5 @@
 .venv/
 .venv_win/
 workspace/generated/
+workspace/catalog/signals-custom.yaml
 .pytest_cache/
