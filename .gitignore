@@ -1,5 +1,4 @@
 .venv/
 .venv_win/
-workspace/catalog/
 workspace/generated/
 .pytest_cache/

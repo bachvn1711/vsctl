@@ -53,9 +53,15 @@ Set up a Python virtual environment and install `vssctl` in editable mode:
 python -m venv .venv_win
 source .venv_win/Scripts/activate  # Or .venv_win\Scripts\activate on Windows
 
-# Install packages
+# Install runtime dependencies (includes the official `vspec` compiler)
 pip install --upgrade pip
+pip install -r requirements.txt
+
+# Install the vssctl CLI itself
 pip install -e .
+
+# Optional: dev dependencies to run the test suite
+pip install -r requirements-dev.txt
 ```
 
 Verify your local installation:

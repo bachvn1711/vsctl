@@ -49,14 +49,25 @@ workspace/
 ## 3. Installation & Getting Started
 
 ### Prerequisites
-- **Python 3.10+** (tested up to 3.11; `python3` on Linux)
-- **Container engine** (Podman or Docker).
+- **Python 3.10+** (tested up to 3.11; `python3` on Linux).
+- **Git** (required to clone the KUKSA Databroker repository for `vssctl build`).
+- **Container engine** (Podman or Docker) — required only for the `build`/`publish` commands.
   - *Linux note:* Podman runs rootless by default. If using Docker, ensure your user is in the `docker` group to run commands without `sudo`:
     ```bash
     sudo usermod -aG docker $USER
     newgrp docker
     ```
-- **Git**
+
+### What Gets Installed
+
+`vssctl` is a Python package. Besides the CLI itself, it needs the official COVESA `vspec` compiler (provided by the `vss-tools` package) to run `vssctl generate`. Install everything through the requirements files:
+
+| File | Contents | Required for |
+|---|---|---|
+| `requirements.txt` | Runtime libraries (`typer`, `rich`, `pyyaml`, `pydantic`, `jinja2`, `textual`, `vss-tools`) | Every command |
+| `requirements-dev.txt` | `-r requirements.txt` + `pytest` | Running the test suite only |
+
+> **Important:** A plain `pip install -e .` installs only the packages declared in `pyproject.toml` and will **not** provide the `vspec` compiler. Always install `requirements.txt` as well, otherwise `vssctl generate` fails with a missing `vspec` executable.
 
 ### Local Setup
 
@@ -66,12 +77,20 @@ workspace/
    python -m venv .venv_win
    .\.venv_win\Scripts\activate
    ```
-2. Install the package in editable mode with development dependencies:
+2. Upgrade pip and install all runtime dependencies (includes the official `vspec` compiler):
    ```bash
-   pip install --upgrade pip
+   python -m pip install --upgrade pip
+   pip install -r requirements.txt
+   ```
+3. Install the `vssctl` package itself (registers the `vssctl` CLI command):
+   ```bash
    pip install -e .
    ```
-3. Run the local environment doctor to verify dependencies and container engines:
+4. (Optional) Install development dependencies to run the test suite:
+   ```bash
+   pip install -r requirements-dev.txt
+   ```
+5. Verify the installation and environment:
    ```bash
    vssctl doctor
    ```
@@ -87,12 +106,20 @@ workspace/
    python3 -m venv .venv
    source .venv/bin/activate
    ```
-3. Install the package in editable mode with development dependencies:
+3. Upgrade pip and install all runtime dependencies (includes the official `vspec` compiler):
    ```bash
-   pip install --upgrade pip
+   python3 -m pip install --upgrade pip
+   pip install -r requirements.txt
+   ```
+4. Install the `vssctl` package itself (registers the `vssctl` CLI command):
+   ```bash
    pip install -e .
    ```
-4. Run the local environment doctor to verify dependencies:
+5. (Optional) Install development dependencies to run the test suite:
+   ```bash
+   pip install -r requirements-dev.txt
+   ```
+6. Verify the installation and environment:
    ```bash
    vssctl doctor
    ```
@@ -238,6 +265,19 @@ Generates auto-completion shell scripts for the command-line console.
   vssctl completion bash > ~/.vssctl-completion.bash
   source ~/.vssctl-completion.bash
   ```
+
+---
+
+### `vssctl browse`
+Opens an interactive terminal UI (Textual) to explore the signal catalog as a tree.
+- **Arguments:**
+  - `--source <base|custom|merged>`: Which catalog view to browse. Default: `merged`.
+- **Usage:**
+  ```bash
+  vssctl browse
+  vssctl browse --source custom
+  ```
+- **Note:** Requires an interactive terminal (`stdin`/`stdout` TTY).
 
 ---
 
