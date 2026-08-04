@@ -4,6 +4,7 @@ from rich.console import Console
 from vssctl.core.catalog import CatalogService
 from vssctl.core.models import Signal
 from vssctl.core.exceptions import ValidationError
+from vssctl.core.baseline import baseline_signal_paths, custom_signals, output_signal_paths
 
 app = typer.Typer()
 
@@ -13,36 +14,26 @@ console = Console()
 @app.command()
 def list():
     service = CatalogService()
-    custom_signals = service.list()
-    
-    base_signals = []
-    try:
-        base_signals = service.storage.load_base().signals
-    except Exception:
-        pass
-        
-    # Merge base and custom signals to display a unified view to developers
-    all_signals = []
-    seen = set()
-    for s in base_signals:
-        path = f"{s.parent}.{s.name}"
-        if path not in seen:
-            seen.add(path)
-            all_signals.append(s)
-    for s in custom_signals:
-        path = f"{s.parent}.{s.name}"
-        if path not in seen:
-            seen.add(path)
-            all_signals.append(s)
+    baseline_paths = baseline_signal_paths()
+    custom_catalog = service.storage.load_custom()
+    custom_entries = custom_signals(custom_catalog.signals, baseline_paths)
+    imported_custom_paths = output_signal_paths() - baseline_paths
 
-    if not all_signals:
-        console.print("[yellow]No signals found.[/yellow]")
-        return
+    console.print("[bold]Base signals[/bold]")
+    if baseline_paths:
+        for path in sorted(baseline_paths):
+            console.print(f"  {path}")
+    else:
+        console.print("  [yellow]No base catalog entries found.[/yellow]")
 
-    for signal in all_signals:
-        console.print(
-            f"{signal.parent}.{signal.name}"
-        )
+    console.print("[bold]Custom signals[/bold]")
+    custom_paths = {f"{signal.parent}.{signal.name}" for signal in custom_entries}
+    custom_paths.update(imported_custom_paths)
+    if custom_paths:
+        for path in sorted(custom_paths):
+            console.print(f"  {path}")
+    else:
+        console.print("  [yellow]No custom signals found.[/yellow]")
 
 
 @app.command()
@@ -88,13 +79,23 @@ def add():
 @app.command()
 def remove(
     path: str = typer.Argument(
-        ...,
+        None,
         help="Full dot-separated path of the signal/branch to remove (e.g. Vehicle.ADAS.RPM).",
-    )
+    ),
+    all_custom: bool = typer.Option(False, "--all", "-a", help="Remove all custom signals."),
 ):
     """
     Remove a signal or branch. If it is a branch, deletes all child signals under it.
     """
+    service = CatalogService()
+    if all_custom:
+        service.storage.save_custom(type(service.catalog)(version=service.catalog.version, signals=[]))
+        console.print("[green]Success: Removed all custom signals. Base catalog was not changed.[/green]")
+        return
+
+    if path is None:
+        console.print("[red]Error: Provide a path or use --all.[/red]")
+        raise typer.Exit(1)
     path = path.strip()
     if not path:
         console.print("[red]Error: Path is required.[/red]")
@@ -107,7 +108,6 @@ def remove(
     except Exception:
         normalized_path = path
         
-    service = CatalogService()
     signals = service.list()
     
     # Decompose normalized_path into parent and name

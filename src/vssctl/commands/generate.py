@@ -1,5 +1,4 @@
 from typing import Optional
-import shutil
 import typer
 from rich.console import Console
 from rich.table import Table
@@ -33,11 +32,7 @@ def run(
     """
     from vssctl.config import settings
 
-    # Resolve output directory
-    target_out_dir = paths.resolve_path_gracefully(settings.output_dir)
-    if not target_out_dir:
-        target_out_dir = paths.GENERATED_DIR
-    target_out_dir.mkdir(parents=True, exist_ok=True)
+    paths.JSON_TREE_DIR.mkdir(parents=True, exist_ok=True)
 
     try:
         # 1. Load catalog
@@ -67,39 +62,28 @@ def run(
                 resolved_version = settings.vss_version
 
             console.print(f"[blue]Starting compilation for VSS version {resolved_version}...[/blue]")
-            output_path = paths.GENERATED_DIR / f"vss_release_{resolved_version}.json"
+            output_path = paths.JSON_TREE_DIR / f"vss_release_{resolved_version}.json"
             compiler.compile(output_path)
-
-            # Copy to output directory if different
-            dest_path = target_out_dir / output_path.name
-            if dest_path.resolve() != output_path.resolve():
-                shutil.copy2(output_path, dest_path)
 
             console.print("Synchronizing custom signals across legacy JSON versions...")
             compiler.sync_all_json_versions(catalog)
 
-            console.print(f"[green]Success! VSS release file created at '{dest_path}'.[/green]")
+            console.print(f"[green]Success! VSS release file created at '{output_path}'.[/green]")
         else:
             # Mode B: Compile all supported versions
             console.print("[blue]No version specified. Generating all supported VSS release versions...[/blue]")
             
             # Compile main 6.0 release first
             default_version = "6.0"
-            tmp_output_path = paths.GENERATED_DIR / f"vss_release_{default_version}.json"
+            tmp_output_path = paths.JSON_TREE_DIR / f"vss_release_{default_version}.json"
             compiler.compile(tmp_output_path)
             
             # Synchronize custom signals across all VSS versions
             compiler.sync_all_json_versions(catalog)
 
-            # Copy files from generated/json_tree/ and generated/ to the destination directory
             generated_files = []
-            
-            # Copy main compiled version
-            dest_main = target_out_dir / tmp_output_path.name
             if tmp_output_path.exists():
-                if dest_main.resolve() != tmp_output_path.resolve():
-                    shutil.copy2(tmp_output_path, dest_main)
-                generated_files.append((default_version, tmp_output_path.name, dest_main))
+                generated_files.append((default_version, tmp_output_path.name, tmp_output_path))
 
             # Copy synchronized legacy versions from generated/json_tree
             if paths.JSON_TREE_DIR.exists() and paths.JSON_TREE_DIR.is_dir():
@@ -107,10 +91,7 @@ def run(
                     if item.is_file() and item.name.startswith("vss_release_") and item.name.endswith(".json"):
                         ver = item.name[len("vss_release_"):-len(".json")]
                         if ver != default_version:
-                            dest_legacy = target_out_dir / item.name
-                            if dest_legacy.resolve() != item.resolve():
-                                shutil.copy2(item, dest_legacy)
-                            generated_files.append((ver, item.name, dest_legacy))
+                            generated_files.append((ver, item.name, item))
 
             # Sort descending by version
             generated_files.sort(key=lambda x: parse_version_tuple(x[0]), reverse=True)

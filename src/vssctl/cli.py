@@ -12,6 +12,7 @@ from vssctl.commands import publish
 from vssctl.commands import validate
 from vssctl.commands import pipeline
 from vssctl.commands import completion
+from vssctl.commands import browse
 
 app = typer.Typer(
     name="vssctl",
@@ -34,6 +35,8 @@ app.command(name="publish", help="Publish Databroker image to GHCR")(publish.run
 app.command(name="validate", help="Validate VSS catalog signals against specs")(validate.run)
 app.command(name="pipeline", help="Run the complete spec workflow (Validate -> Generate -> Build -> Publish)")(pipeline.run)
 app.command(name="completion", help="Generate shell completion scripts")(completion.run)
+app.command(name="browse", help="Browse the signal tree interactively")(browse.run)
+app.command(name="remove", help="Remove custom signals")(signal.remove)
 
 
 @app.callback()
