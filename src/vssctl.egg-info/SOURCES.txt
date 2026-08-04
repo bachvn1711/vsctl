@@ -21,9 +21,7 @@ src/vssctl/commands/validate.py
 src/vssctl/core/catalog.py
 src/vssctl/core/compiler.py
 src/vssctl/core/constants.py
-src/vssctl/core/demo_tree.py
 src/vssctl/core/exceptions.py
-src/vssctl/core/exporter.py
 src/vssctl/core/generator.py
 src/vssctl/core/models.py
 src/vssctl/core/paths.py
