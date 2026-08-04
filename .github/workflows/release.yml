@@ -67,7 +67,7 @@ jobs:
           IMAGE_TAG=$(echo "$IMAGE_TAG" | sed 's/\//-/g')
           
           vssctl build \
-            -f workspace/generated/vss_release_6.0.json \
+            -f workspace/generated/json_tree/vss_release_*.json \
             -t ghcr.io/bachvn1711/databroker:$IMAGE_TAG \
             --publish \
             --username bachvn1711 \
