@@ -3,3 +3,5 @@
 workspace/catalog/
 workspace/generated/
 .pytest_cache/
+__pycache__/
+*.pyc

@@ -56,6 +56,31 @@ def test_compile(mock_run, tmp_path, monkeypatch):
     assert "-o" in args
     assert str(metadata_json) in args
 
+
+def test_compile_requires_at_least_one_vspec(tmp_path, monkeypatch):
+    merged_dir = tmp_path / "merged"
+    merged_dir.mkdir()
+    monkeypatch.setattr(paths, "MERGED_DIR", merged_dir)
+
+    with pytest.raises(RuntimeError, match="No .vspec files found"):
+        Compiler().compile(tmp_path / "output.json")
+
+
+@patch("subprocess.run")
+def test_compile_reports_exporter_error(mock_run, tmp_path, monkeypatch):
+    merged_dir = tmp_path / "merged"
+    merged_dir.mkdir()
+    (merged_dir / "company.vspec").write_text("company", encoding="utf-8")
+    monkeypatch.setattr(paths, "MERGED_DIR", merged_dir)
+    mock_run.side_effect = subprocess.CalledProcessError(
+        2,
+        ["vspec"],
+        stderr="invalid specification",
+    )
+
+    with pytest.raises(RuntimeError, match="invalid specification"):
+        Compiler().compile(tmp_path / "output.json")
+
 def test_sync_all_json_versions(tmp_path, monkeypatch):
     templates_dir = tmp_path / "templates"
     json_tree_dir = tmp_path / "json_tree"
@@ -158,4 +183,3 @@ def test_sync_all_json_versions(tmp_path, monkeypatch):
     
     # OldCustom should be removed from vss_release_6.0.json
     assert "OldCustom" not in tree_60["Vehicle"]["children"]["ADAS"]["children"]
-

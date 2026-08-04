@@ -1,3 +1,5 @@
+import json
+
 from vssctl.core.baseline import custom_signals
 from vssctl.core.baseline import baseline_signal_paths, output_signal_paths
 from vssctl.core.models import Signal
@@ -16,5 +18,19 @@ def test_output_baseline_is_available_for_classification():
     assert "Vehicle" in paths
 
 
-def test_output_json_extra_paths_are_custom():
+def test_output_json_extra_paths_are_custom(isolated_workspace):
+    output = {
+        "Vehicle": {
+            "type": "branch",
+            "children": {
+                "ADAS": {
+                    "type": "branch",
+                    "children": {"RPM": {"type": "sensor", "datatype": "int32"}},
+                }
+            },
+        }
+    }
+    output_path = isolated_workspace.generated_dir / "json_tree" / "vss_release_6.0.json"
+    output_path.parent.mkdir(parents=True)
+    output_path.write_text(json.dumps(output), encoding="utf-8")
     assert "Vehicle.ADAS.RPM" in output_signal_paths("6.0") - baseline_signal_paths("6.0")

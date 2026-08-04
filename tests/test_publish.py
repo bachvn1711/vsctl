@@ -172,3 +172,64 @@ def test_build_with_publish_shortcut(
         engine="podman",
         skip_login=True,
     )
+
+
+@patch("vssctl.commands.publish.resolve_engine", return_value="docker")
+@patch("subprocess.run")
+@patch("subprocess.Popen")
+@patch.dict(os.environ, {"GHCR_TOKEN": "environment-token", "CR_PAT": "fallback-token"}, clear=True)
+def test_explicit_token_precedes_environment_and_default_tag(mock_popen, mock_run, mock_resolve):
+    mock_run.return_value = MagicMock(returncode=0)
+    mock_popen.return_value = MagicMock(returncode=0, stdout=[])
+
+    remote_uri = run_publish_flow(
+        image="kuksa-databroker:vss-6.0",
+        remote_tag=None,
+        token="explicit-token",
+        username="example",
+        engine="docker",
+        skip_login=False,
+    )
+
+    assert remote_uri == "ghcr.io/example/databroker:vss-6.0"
+    login_call = mock_run.call_args_list[1]
+    assert login_call.kwargs["input"] == "explicit-token"
+
+
+@patch("vssctl.commands.publish.resolve_engine", return_value="docker")
+@patch("subprocess.run")
+def test_publish_tag_failure_returns_one(mock_run, mock_resolve):
+    mock_run.side_effect = [
+        MagicMock(returncode=0),
+        subprocess.CalledProcessError(1, ["docker", "tag"], stderr=b"tag failed"),
+    ]
+
+    with pytest.raises(typer.Exit) as exc_info:
+        run_publish_flow(
+            image="local:test",
+            remote_tag="test",
+            token=None,
+            username="example",
+            engine="docker",
+            skip_login=True,
+        )
+    assert exc_info.value.exit_code == 1
+
+
+@patch("vssctl.commands.publish.resolve_engine", return_value="docker")
+@patch("subprocess.run")
+@patch("subprocess.Popen")
+def test_publish_push_failure_returns_one(mock_popen, mock_run, mock_resolve):
+    mock_run.return_value = MagicMock(returncode=0)
+    mock_popen.return_value = MagicMock(returncode=7, stdout=["push failed"])
+
+    with pytest.raises(typer.Exit) as exc_info:
+        run_publish_flow(
+            image="local:test",
+            remote_tag="test",
+            token=None,
+            username="example",
+            engine="docker",
+            skip_login=True,
+        )
+    assert exc_info.value.exit_code == 1

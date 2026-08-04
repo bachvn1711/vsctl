@@ -96,18 +96,12 @@ def test_validate_command_failure_invalid_name(mock_catalog_service):
         validate.run()
 
 
-@patch("subprocess.run")
-def test_completion_command_generation(mock_run):
-    mock_run.return_value = MagicMock(stdout="complete -o default -F _vssctl_completion vssctl", returncode=0)
-
-    # Calling completion generator for bash
-    completion.run(shell="bash")
-
-    mock_run.assert_called_once()
-    args, kwargs = mock_run.call_args
-    cmd = args[0]
-    assert cmd[1:] == ["-m", "vssctl.cli"]
-    assert kwargs["env"]["_VSSCTL_COMPLETE"] == "bash_source"
+@pytest.mark.parametrize("shell", ["bash", "zsh", "fish"])
+def test_completion_command_generation(shell, capsys):
+    completion.run(shell=shell)
+    output = capsys.readouterr().out
+    assert "_VSSCTL_COMPLETE" in output
+    assert "vssctl" in output
 
 
 @patch("vssctl.commands.validate.run")
@@ -144,6 +138,22 @@ def test_pipeline_workflow(mock_build, mock_generate, mock_validate):
     )
 
 
+@pytest.mark.parametrize("failing_step", ["validate", "generate", "build"])
+def test_pipeline_stops_after_first_failure(failing_step):
+    with patch("vssctl.commands.pipeline.validate.run") as mock_validate, \
+         patch("vssctl.commands.pipeline.generate.run") as mock_generate, \
+         patch("vssctl.commands.pipeline.build.run") as mock_build:
+        mocks = {"validate": mock_validate, "generate": mock_generate, "build": mock_build}
+        mocks[failing_step].side_effect = typer.Exit(1)
+
+        with pytest.raises(typer.Exit):
+            pipeline.run(version="6.0")
+
+        assert mock_validate.call_count == 1
+        assert mock_generate.call_count == (0 if failing_step == "validate" else 1)
+        assert mock_build.call_count == (1 if failing_step == "build" else 0)
+
+
 def test_parent_wheels_normalization():
     # Test plural -> singular normalization (e.g. Wheels -> Wheel, Doors -> Door)
     sig = Signal(parent="Vehicle.Chassis.Wheels", name="SteerAngle", datatype="int16", description="Angle")
@@ -175,29 +185,26 @@ def test_parent_wheels_normalization():
 @patch("vssctl.commands.generate.TreeBuilder")
 @patch("vssctl.commands.generate.Generator")
 @patch("vssctl.commands.generate.Compiler")
-def test_generate_all_versions(mock_compiler_class, mock_generator_class, mock_tree_class, mock_catalog_class, tmp_path):
+def test_generate_all_versions(
+    mock_compiler_class,
+    mock_generator_class,
+    mock_tree_class,
+    mock_catalog_class,
+    isolated_workspace,
+):
     mock_catalog = MagicMock()
     mock_catalog_class.return_value.catalog = mock_catalog
     
     mock_compiler = MagicMock()
     mock_compiler_class.return_value = mock_compiler
     
-    # Mock settings.output_dir to use a temp dir
-    from vssctl.config import settings
-    original_output_dir = settings.output_dir
-    settings.output_dir = str(tmp_path)
-    
-    try:
-        from vssctl.commands import generate
-        # Run generate without arguments
-        generate.run(version=None)
-        
-        # Verify compiler.compile was called with the default 6.0 path
-        mock_compiler.compile.assert_called_once()
-        # Verify sync_all_json_versions was called with catalog
-        mock_compiler.sync_all_json_versions.assert_called_once_with(mock_catalog)
-    finally:
-        settings.output_dir = original_output_dir
+    from vssctl.commands import generate
+    generate.run(version=None)
+
+    mock_compiler.compile.assert_called_once_with(
+        isolated_workspace.generated_dir / "json_tree" / "vss_release_6.0.json"
+    )
+    mock_compiler.sync_all_json_versions.assert_called_once_with(mock_catalog)
 
 
 def test_validator_parent_existence():

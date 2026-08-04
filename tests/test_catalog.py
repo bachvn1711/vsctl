@@ -1,30 +1,9 @@
-from pathlib import Path
-
-import yaml
-
 from vssctl.core.catalog import CatalogService
 from vssctl.core.models import Signal
 from vssctl.core.storage import Storage
 
 
-def clean_catalog():
-    for name in ("signals.yaml", "signals-custom.yaml", "signals-base.yaml"):
-        path = Path("workspace/catalog") / name
-        path.parent.mkdir(parents=True, exist_ok=True)
-        with open(path, "w") as f:
-            yaml.safe_dump(
-                {
-                    "version": "0.1",
-                    "signals": [],
-                },
-                f,
-                sort_keys=False,
-            )
-
-
-def test_add_signal():
-
-    clean_catalog()
+def test_add_signal(isolated_workspace):
 
     service = CatalogService()
 
@@ -44,9 +23,7 @@ def test_add_signal():
     assert catalog.signals[0].name == "Speed"
 
 
-def test_remove_signal():
-
-    clean_catalog()
+def test_remove_signal(isolated_workspace):
 
     service = CatalogService()
 
@@ -69,9 +46,7 @@ def test_remove_signal():
     assert len(catalog.signals) == 0
 
 
-def test_search_signal():
-
-    clean_catalog()
+def test_search_signal(isolated_workspace):
 
     service = CatalogService()
 
@@ -100,9 +75,7 @@ def test_search_signal():
     assert result[0].name == "Speed"
 
 
-def test_list_signal():
-
-    clean_catalog()
+def test_list_signal(isolated_workspace):
 
     service = CatalogService()
 
@@ -120,9 +93,7 @@ def test_list_signal():
     assert len(signals) == 1
 
 
-def test_storage_load_save():
-
-    clean_catalog()
+def test_storage_load_save(isolated_workspace):
 
     storage = Storage()
 

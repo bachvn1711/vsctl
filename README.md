@@ -98,9 +98,16 @@ vssctl pipeline --publish --token <your-github-pat>
 
 ---
 
+## Local Testing
+
+To safely exercise signal management, validation, VSS generation, the terminal UI, and the automated test suite, follow the **[Local Testing Guide](local_test_guide.md)**. It uses an isolated copy so local test data does not alter your working catalog or generated files.
+
+---
+
 ## Detailed Documentation & Guides
 
-For advanced configuration, environment troubleshooting, and command guides, refer to the **[vssctl Handbook](file:///d:/Work/CODE/AUTONXT_AI/vsctl/handbook.md)** located in the project root.
+- **[Local Testing Guide](local_test_guide.md):** Safe manual and automated local verification.
+- **[vssctl Handbook](handbook.md):** Architecture, configuration, commands, and troubleshooting.
 
 ---
 

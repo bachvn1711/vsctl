@@ -170,3 +170,78 @@ def test_run_command_flow(mock_popen, mock_copy, mock_find_latest, mock_context,
     assert "--no-cache" in cmd_args
     assert cmd_args[-1] == "."
     assert kwargs["cwd"] == str(build_dir)
+
+
+def test_resolve_engine_rejects_unsupported_choice():
+    with pytest.raises(typer.Exit) as exc_info:
+        resolve_engine("containerd")
+    assert exc_info.value.exit_code == 1
+
+
+@patch("platform.machine", return_value="x86_64")
+@patch("vssctl.commands.build.resolve_engine", return_value="docker")
+@patch("subprocess.Popen")
+def test_build_fast_path_uses_prebuilt_binary_and_cleans_up(mock_popen, mock_resolve, mock_machine, tmp_path):
+    build_dir = tmp_path / "databroker"
+    (build_dir / "databroker").mkdir(parents=True)
+    (build_dir / "Cargo.toml").touch()
+    binary = build_dir / "dist" / "amd64" / "databroker"
+    binary.parent.mkdir(parents=True)
+    binary.touch()
+    vss_file = tmp_path / "vss_release_6.0.json"
+    vss_file.write_text("{}", encoding="utf-8")
+
+    captured = {}
+
+    def capture_build(*args, **kwargs):
+        captured["dockerfile"] = (build_dir / "Dockerfile.vssctl").read_text(encoding="utf-8")
+        process = MagicMock(returncode=0, stdout=[])
+        return process
+
+    mock_popen.side_effect = capture_build
+
+    run(vss_file=vss_file, engine="docker", databroker_dir=build_dir)
+
+    assert "COPY dist/amd64/databroker /app/databroker" in captured["dockerfile"]
+    assert "cargo build" not in captured["dockerfile"]
+    assert not (build_dir / "Dockerfile.vssctl").exists()
+    assert not (build_dir / "vss_release.json").exists()
+
+
+@patch("vssctl.commands.build.resolve_engine", return_value="docker")
+@patch("subprocess.Popen")
+def test_failed_build_cleans_temporary_files(mock_popen, mock_resolve, tmp_path):
+    build_dir = tmp_path / "databroker"
+    (build_dir / "databroker").mkdir(parents=True)
+    (build_dir / "Cargo.toml").touch()
+    vss_file = tmp_path / "vss_release_6.0.json"
+    vss_file.write_text("{}", encoding="utf-8")
+    mock_popen.return_value = MagicMock(returncode=9, stdout=["failed"])
+
+    with pytest.raises(typer.Exit) as exc_info:
+        run(vss_file=vss_file, engine="docker", databroker_dir=build_dir)
+
+    assert exc_info.value.exit_code == 1
+    assert not (build_dir / "Dockerfile.vssctl").exists()
+    assert not (build_dir / "vss_release.json").exists()
+
+
+@patch("vssctl.commands.build.resolve_engine", return_value="docker")
+@patch("subprocess.Popen")
+def test_build_restores_windows_git_symlink_file(mock_popen, mock_resolve, tmp_path):
+    build_dir = tmp_path / "databroker"
+    (build_dir / "databroker").mkdir(parents=True)
+    (build_dir / "Cargo.toml").touch()
+    (build_dir / "proto").mkdir()
+    (build_dir / "proto" / "schema.proto").write_text("syntax = 'proto3';", encoding="utf-8")
+    symlink_file = build_dir / "databroker-proto" / "proto"
+    symlink_file.parent.mkdir()
+    symlink_file.write_text("../proto/", encoding="utf-8")
+    vss_file = tmp_path / "vss_release_6.0.json"
+    vss_file.write_text("{}", encoding="utf-8")
+    mock_popen.return_value = MagicMock(returncode=0, stdout=[])
+
+    run(vss_file=vss_file, engine="docker", databroker_dir=build_dir)
+
+    assert symlink_file.is_file()
+    assert symlink_file.read_text(encoding="utf-8") == "../proto/"
