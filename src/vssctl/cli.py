@@ -13,6 +13,7 @@ from vssctl.commands import validate
 from vssctl.commands import pipeline
 from vssctl.commands import completion
 from vssctl.commands import browse
+from vssctl.commands import dashboard
 
 app = typer.Typer(
     name="vssctl",
@@ -37,6 +38,7 @@ app.command(name="pipeline", help="Run the complete spec workflow (Validate -> G
 app.command(name="completion", help="Generate shell completion scripts")(completion.run)
 app.command(name="browse", help="Browse the signal tree interactively")(browse.run)
 app.command(name="remove", help="Remove custom signals")(signal.remove)
+app.command(name="dashboard", help="Start the web management dashboard")(dashboard.run)
 
 
 @app.callback()

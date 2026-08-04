@@ -3,3 +3,8 @@
 workspace/generated/
 workspace/catalog/signals-custom.yaml
 .pytest_cache/
+
+# Python bytecode caches
+__pycache__/
+*.py[cod]
+*.so

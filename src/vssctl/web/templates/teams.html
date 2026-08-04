@@ -1,0 +1,2 @@
+{% extends "base.html" %}
+{% block content %}<h1>Teams</h1><section class="cards">{% for team in teams %}<article><h2>{{ team.name }}</h2><p>{{ team.signal_count }} owned nodes</p></article>{% else %}<p>No team catalogs found.</p>{% endfor %}</section>{% endblock %}

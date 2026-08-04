@@ -1,0 +1,2 @@
+{% extends "base.html" %}
+{% block content %}<h1>Catalog documentation</h1><p><a href="{{ url_for('reports.markdown_docs') }}">Download Markdown</a></p><table><thead><tr><th>Path</th><th>Owner</th><th>Since</th><th>Datatype</th><th>Description</th></tr></thead><tbody>{% for signal in signals %}<tr><td>{{ signal.path }}</td><td>{{ signal.owner }}</td><td>{{ signal.since or '-' }}</td><td>{{ signal.datatype or 'branch' }}</td><td>{{ signal.description }}</td></tr>{% else %}<tr><td colspan="5">No catalog signals found.</td></tr>{% endfor %}</tbody></table>{% endblock %}
